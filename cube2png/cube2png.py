@@ -1,6 +1,5 @@
 import argparse
 import os.path
-
 import png
 
 
@@ -9,33 +8,33 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
 
-def isFloat(str):
-    return str.replace('.', '', 1).isdigit()
+def is_float(s):
+    return s.replace('.', '', 1).isdigit()
 
 
 def read_cube(fileName):
-    lut_size = -1
-    lut_data = bytearray()
+    local_lut_size = -1
+    local_lut_data = bytearray()
     pixels = -1
 
     with open(fileName) as aFile:
         for aLine in aFile:
-            if lut_size < 0 and aLine.upper().startswith('LUT_3D_SIZE'):
+            if local_lut_size < 0 and aLine.upper().startswith('LUT_3D_SIZE'):
                 a = aLine.split()
-                lut_size = int(a[1])
-                lut_data = bytearray(lut_size * lut_size * lut_size * 4)
-                print(f"lut size = {lut_size}")
+                local_lut_size = int(a[1])
+                local_lut_data = bytearray(local_lut_size * local_lut_size * local_lut_size * 4)
+                print(f"lut size = {local_lut_size}")
                 continue
 
             if pixels < 0 and aLine.upper().startswith('#LUT DATA POINTS'):
                 pixels = 0
                 continue
 
-            if pixels < 0 and lut_size >= 0:
+            if pixels < 0 and local_lut_size >= 0:
                 print(f"for line:{aLine}")
                 tmp = aLine.split()
                 print(tmp)
-                if len(tmp) == 3 and isFloat(tmp[0]) and isFloat(tmp[1]) and isFloat(tmp[2]):
+                if len(tmp) == 3 and is_float(tmp[0]) and is_float(tmp[1]) and is_float(tmp[2]):
                     pixels = 0
                     print(f"set pixels = 0 by line: {aLine}")
                 else:
@@ -45,12 +44,12 @@ def read_cube(fileName):
                 nums = aLine.split()
                 if len(nums) == 3:
                     # print(nums)
-                    lut_data[pixels * 4] = int(float(nums[0]) * 255)
-                    lut_data[pixels * 4 + 1] = int(float(nums[1]) * 255)
-                    lut_data[pixels * 4 + 2] = int(float(nums[2]) * 255)
-                    lut_data[pixels * 4 + 3] = int(255)
+                    local_lut_data[pixels * 4] = int(float(nums[0]) * 255)
+                    local_lut_data[pixels * 4 + 1] = int(float(nums[1]) * 255)
+                    local_lut_data[pixels * 4 + 2] = int(float(nums[2]) * 255)
+                    local_lut_data[pixels * 4 + 3] = int(255)
                     pixels += 1
-    return lut_size, lut_data
+    return local_lut_size, local_lut_data
 
 
 def write_png(fileName, lutSize, lutData):
